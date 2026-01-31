@@ -11,7 +11,9 @@ class ApiKeyMiddleware
     public function handle(Request $request, Closure $next)
     {
         $key = $request->header('X-API-KEY');
-        $allowedKeys = explode(',', env('ALLOWED_API_KEYS', ''));
+        $allowedKeys = explode(',', env('ALLOWED_API_KEYS_FILE') && file_exists(env('ALLOWED_API_KEYS_FILE'))
+            ? trim(file_get_contents(env('ALLOWED_API_KEYS_FILE')))
+            : env('ALLOWED_API_KEYS', ''));
 
         if (!in_array($key, $allowedKeys)) {
             return ResponseFormatter::error(
